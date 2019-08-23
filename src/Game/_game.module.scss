@@ -1,0 +1,39 @@
+@import '../../node_modules/packard-belle/src/_scss/w98/functions/box-shadows.scss';
+
+.this {
+  background-color: $grey;
+  height: 20px;
+  width: 20px;
+  box-shadow: inset -1px -1px 0px $darkgrey, inset 1px 1px 0px white;
+  border: none;
+  outline: none;
+}
+.flagged {
+  background-color: green;
+}
+.clicked {
+  background-color: $grey;
+  box-shadow: none;
+  position: relative;
+  display: inline-flex;
+  align-content: center;
+  text-align: center;
+  &:after {
+    width: 100%;
+    align-self: center;
+    content: attr(data-warningcount);
+    font-weight: bold;
+  }
+}
+.mine {
+  background-color: red;
+}
+
+.grid {
+  display: grid;
+  grid-gap: 0px;
+  color: #444;
+  margin: 1px;
+  box-shadow: inset 1px 1px 0px $black, inset -1px -1px 0px white;
+  padding: 1px;
+}
