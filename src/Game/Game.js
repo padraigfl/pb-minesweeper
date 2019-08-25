@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import cx from 'classnames';
 import Cell from './Cell';
 import styles from './_game.module.scss';
-import Counter from './Counter';
+import Status from './Status';
 
 const getRelativePositionsOfSurroundingCells = (gridSize, idx) => {
   const surroundingCells = [idx - gridSize, idx + gridSize];
@@ -21,9 +22,9 @@ const getRelativePositionsOfSurroundingCells = (gridSize, idx) => {
   return surroundingCells.filter(index => index > -1 && index < gridSize ** 2);
 };
 
-const setMines = gridSize => {
+const setMines = (gridSize, minesCount) => {
   const mines = [];
-  for (let i = 0; i < gridSize; i += 1) {
+  for (let i = 0; i < minesCount; i += 1) {
     let nextMineIdx = -1;
     while (nextMineIdx === -1) {
       const suggestedIdx = Math.floor(Math.random() * gridSize ** 2);
@@ -36,8 +37,8 @@ const setMines = gridSize => {
   return mines;
 };
 
-const initialize = gridSize => {
-  const mineIndex = setMines(gridSize);
+const initialize = (gridSize, mines) => {
+  const mineIndex = setMines(gridSize, mines);
   return new Array(gridSize ** 2)
     .fill({
       clicked: false,
@@ -94,38 +95,77 @@ const onClickCell = (state, clickedIndex) => {
 };
 
 const Grid = props => {
-  const [boardState, updateBoard] = useState(initialize(props.gridSize));
+  const [boardState, updateBoard] = useState(
+    initialize(props.gridSize, props.mines)
+  );
   const [flagged, updateFlagged] = useState([]);
+  const [questioned, updateQuestioned] = useState([]);
+  const [movesCount, updateMovesCount] = useState(0);
+  const [endState, setEndState] = useState(null);
 
-  useEffect(() => {});
-  // useEffect(() => {
-  //   updateBoard(initialize(props.gridSize));
-  // }, []);
+  const restart = () => {
+    updateBoard(initialize(props.gridSize, props.mines));
+    updateFlagged([]);
+    updateQuestioned([]);
+    setEndState(null);
+  };
+
+  useEffect(() => {
+    const remaining = boardState.filter(cell => !cell.clicked).length;
+    if (remaining === 0) {
+      setEndState({ lose: true });
+    } else if (remaining === props.mines) {
+      setEndState({ win: true });
+    }
+  }, boardState);
+
+  useEffect(restart, [props.gameId]);
 
   const onClick = e => {
-    if (boardState[e.target.value].isMine) {
-      updateBoard(boardState.map(val => ({ ...val, clicked: true })));
+    const value = +e.target.dataset.value;
+    updateMovesCount(movesCount + 1);
+    if (boardState[value].isMine) {
+      const updatedBoard = boardState.map(val => ({ ...val, clicked: true }));
+      updatedBoard[value].end = true;
+      updateBoard(updatedBoard);
       return;
     }
-    const x = onClickCell(boardState, +e.target.value);
+    const x = onClickCell(boardState, value);
     updateBoard(x);
   };
+
   const onFlag = e => {
-    const isFlagged = flagged.indexOf(e.target.value);
-    if (isFlagged) {
-      updateFlagged(flagged.filter((arr, i) => i !== isFlagged));
+    const value = +e.target.dataset.value;
+    e.preventDefault();
+    e.stopPropagation();
+    const alreadyFlagged = flagged.includes(value);
+    const alreadyQuestioned = questioned.includes(value);
+    if (alreadyQuestioned) {
+      updateQuestioned(questioned.filter(val => val !== value));
       return;
     }
-    updateFlagged([...flagged, e.target.value]);
+    if (alreadyFlagged) {
+      updateFlagged(flagged.filter(val => val !== value));
+      updateQuestioned([...questioned, value]);
+      return;
+    }
+    updateFlagged([...flagged, value]);
   };
 
   return (
-    <div>
-      <div>
-        <Counter value={0} />
-        <button>:)</button>
-        <Counter value={0} />
-      </div>
+    <div
+      className={cx(styles.minesweeper, {
+        [styles.win]: endState && endState.win,
+        [styles.lose]: endState && endState.lose
+      })}
+    >
+      <Status
+        totalMines={props.mines}
+        numberFlagged={flagged.length}
+        newGame={restart}
+        totalMoves={movesCount}
+        endState={endState}
+      />
       <div
         className={styles.grid}
         style={{
@@ -136,8 +176,11 @@ const Grid = props => {
           <Cell
             mine={cell.isMine}
             clicked={cell.clicked}
+            end={cell.end}
             flagged={flagged.includes(idx)}
+            questioned={questioned.includes(idx)}
             warningCount={cell.warningCount}
+            gameOver={endState}
             onClick={onClick}
             onFlag={onFlag}
             id={idx}
@@ -149,7 +192,8 @@ const Grid = props => {
 };
 
 Grid.defaultProps = {
-  gridSize: 10
+  gridSize: 9,
+  mines: 10
 };
 
 export default Grid;

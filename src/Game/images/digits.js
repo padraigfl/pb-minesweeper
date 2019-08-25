@@ -1,0 +1,11 @@
+export { default as digit0 } from './digit0.png';
+export { default as digit1 } from './digit1.png';
+export { default as digit2 } from './digit2.png';
+export { default as digit3 } from './digit3.png';
+export { default as digit4 } from './digit4.png';
+export { default as digit5 } from './digit5.png';
+export { default as digit6 } from './digit6.png';
+export { default as digit7 } from './digit7.png';
+export { default as digit8 } from './digit8.png';
+export { default as digit9 } from './digit9.png';
+export { default as digit_ } from './digit-.png';
