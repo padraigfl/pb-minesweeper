@@ -2,15 +2,17 @@
   "name": "pb-minesweeper",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "./node_modules/.bin/jest",
     "test:watch": "./node_modules/.bin/jest --watch",
     "lint": "./node_modules/.bin/eslint src/ ",
     "pretty-quick": "./node_modules/.bin/pretty-quick --staged",
     "build": "webpack --mode production",
+    "build:module": "rollup -c rollup.config.js",
     "netlify": "node ./create-env.js && npm run build",
-    "start": "webpack-dev-server --open --mode development"
+    "start": "webpack-dev-server --open --mode development",
+    "prepublishOnly": "npm run build:module"
   },
   "keywords": [],
   "author": "",
@@ -43,6 +45,14 @@
     "style-loader": "^1.0.0",
     "url-loader": "^1.1.2",
     "video.js": "^7.5.4",
+    "rollup": "^0.63.5",
+    "rollup-plugin-auto-external": "^2.0.0",
+    "rollup-plugin-babel": "^4.0.3",
+    "rollup-plugin-commonjs": "^9.1.4",
+    "rollup-plugin-img": "^1.1.0",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-postcss": "^1.6.2",
+    "rollup-plugin-replace": "^2.0.0",
     "webpack": "^4.30.0",
     "webpack-cli": "^3.3.1",
     "webpack-dev-server": "^3.3.1"
@@ -60,12 +70,7 @@
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "classnames": "^2.2.6",
     "core-js": "^2.6.5",
-    "nanoid": "^2.0.1",
-    "packard-belle": "github:padraigfl/packard-belle#0.3.3",
     "react": "^16.8.3",
-    "react-dom": "^16.8.3",
-    "react-rnd": "^9.1.2",
-    "react-scripts": "2.1.5",
-    "safe-eval": "^0.4.1"
+    "react-dom": "^16.8.3"
   }
 }
