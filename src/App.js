@@ -9,7 +9,7 @@ const App = props => {
 
 App.defaultProps = {
   gameId: 1, // to trigger restart
-  gridSize: 10, // @todo needs to be an array
+  gridSize: [9, 9], // @todo needs to be an array
   mines: 11
 };
 

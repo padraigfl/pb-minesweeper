@@ -5,12 +5,14 @@ import styles from './_game.module.scss';
 import Status from './Status';
 
 const getRelativePositionsOfSurroundingCells = (gridSize, idx) => {
-  const surroundingCells = [idx - gridSize, idx + gridSize];
-  const leftSide = [idx - gridSize - 1, idx - 1, idx + gridSize - 1];
-  const rightSide = [idx - gridSize + 1, idx + 1, idx + gridSize + 1];
+  debugger;
+  const gridColSize = gridSize[0];
+  const surroundingCells = [idx - gridColSize, idx + gridColSize];
+  const leftSide = [idx - gridColSize - 1, idx - 1, idx + gridColSize - 1];
+  const rightSide = [idx - gridColSize + 1, idx + 1, idx + gridColSize + 1];
 
-  const onLeftColumn = idx % gridSize === 0;
-  const onRightColumn = idx % gridSize === gridSize - 1;
+  const onLeftColumn = idx % gridColSize === 0;
+  const onRightColumn = idx % gridColSize === gridColSize - 1;
 
   if (!onLeftColumn && !onRightColumn) {
     surroundingCells.push(...leftSide, ...rightSide);
@@ -19,15 +21,20 @@ const getRelativePositionsOfSurroundingCells = (gridSize, idx) => {
   } else if (!onRightColumn) {
     surroundingCells.push(...rightSide);
   }
-  return surroundingCells.filter(index => index > -1 && index < gridSize ** 2);
+  return surroundingCells.filter(
+    index => index > -1 && index < gridSize[0] * gridSize[1]
+  );
 };
 
 const setMines = (gridSize, minesCount) => {
+  debugger;
   const mines = [];
   for (let i = 0; i < minesCount; i += 1) {
     let nextMineIdx = -1;
     while (nextMineIdx === -1) {
-      const suggestedIdx = Math.floor(Math.random() * gridSize ** 2);
+      const suggestedIdx = Math.floor(
+        Math.random() * gridSize[0] * gridSize[1]
+      );
       if (!mines.includes(suggestedIdx)) {
         nextMineIdx = suggestedIdx;
       }
@@ -39,7 +46,7 @@ const setMines = (gridSize, minesCount) => {
 
 const initialize = (gridSize, mines) => {
   const mineIndex = setMines(gridSize, mines);
-  return new Array(gridSize ** 2)
+  return new Array(gridSize[0] * gridSize[1])
     .fill({
       clicked: false,
       flagged: false
@@ -63,10 +70,10 @@ const initialize = (gridSize, mines) => {
     });
 };
 
-const clickEvent = (state, clickedIndex) => {
+const clickEvent = (state, gridSize, clickedIndex) => {
   console.log(clickedIndex);
   const surroundingCellIndexes = getRelativePositionsOfSurroundingCells(
-    Math.sqrt(state.length),
+    gridSize,
     clickedIndex
   );
   if (clickedIndex > state.length - 1) {
@@ -80,7 +87,7 @@ const clickEvent = (state, clickedIndex) => {
       return;
     }
     if (!state[idx].warningCount) {
-      clickEvent(state, idx);
+      clickEvent(state, gridSize, idx);
     } else {
       state[idx].clicked = true;
     }
@@ -89,9 +96,9 @@ const clickEvent = (state, clickedIndex) => {
   return state;
 };
 
-const onClickCell = (state, clickedIndex) => {
+const onClickCell = (state, gridSize, clickedIndex) => {
   const stateCopy = JSON.parse(JSON.stringify(state));
-  return clickEvent(stateCopy, clickedIndex);
+  return clickEvent(stateCopy, gridSize, clickedIndex);
 };
 
 const Grid = props => {
@@ -130,7 +137,7 @@ const Grid = props => {
       updateBoard(updatedBoard);
       return;
     }
-    const x = onClickCell(boardState, value);
+    const x = onClickCell(boardState, props.gridSize, value);
     updateBoard(x);
   };
 
@@ -169,7 +176,7 @@ const Grid = props => {
       <div
         className={styles.grid}
         style={{
-          gridTemplateColumns: `repeat(${props.gridSize}, 1fr)`
+          gridTemplateColumns: `repeat(${props.gridSize[0]}, 1fr)`
         }}
       >
         {boardState.map((cell, idx) => (
@@ -192,7 +199,7 @@ const Grid = props => {
 };
 
 Grid.defaultProps = {
-  gridSize: 9,
+  gridSize: [9, 9],
   mines: 10
 };
 
