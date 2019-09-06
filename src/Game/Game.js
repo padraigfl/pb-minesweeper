@@ -5,7 +5,6 @@ import styles from './_game.module.scss';
 import Status from './Status';
 
 const getRelativePositionsOfSurroundingCells = (gridSize, idx) => {
-  debugger;
   const gridColSize = gridSize[0];
   const surroundingCells = [idx - gridColSize, idx + gridColSize];
   const leftSide = [idx - gridColSize - 1, idx - 1, idx + gridColSize - 1];
@@ -27,7 +26,6 @@ const getRelativePositionsOfSurroundingCells = (gridSize, idx) => {
 };
 
 const setMines = (gridSize, minesCount) => {
-  debugger;
   const mines = [];
   for (let i = 0; i < minesCount; i += 1) {
     let nextMineIdx = -1;
@@ -71,7 +69,6 @@ const initialize = (gridSize, mines) => {
 };
 
 const clickEvent = (state, gridSize, clickedIndex) => {
-  console.log(clickedIndex);
   const surroundingCellIndexes = getRelativePositionsOfSurroundingCells(
     gridSize,
     clickedIndex

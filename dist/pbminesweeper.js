@@ -276,11 +276,12 @@
   };
 
   var getRelativePositionsOfSurroundingCells = function getRelativePositionsOfSurroundingCells(gridSize, idx) {
-    var surroundingCells = [idx - gridSize, idx + gridSize];
-    var leftSide = [idx - gridSize - 1, idx - 1, idx + gridSize - 1];
-    var rightSide = [idx - gridSize + 1, idx + 1, idx + gridSize + 1];
-    var onLeftColumn = idx % gridSize === 0;
-    var onRightColumn = idx % gridSize === gridSize - 1;
+    var gridColSize = gridSize[0];
+    var surroundingCells = [idx - gridColSize, idx + gridColSize];
+    var leftSide = [idx - gridColSize - 1, idx - 1, idx + gridColSize - 1];
+    var rightSide = [idx - gridColSize + 1, idx + 1, idx + gridColSize + 1];
+    var onLeftColumn = idx % gridColSize === 0;
+    var onRightColumn = idx % gridColSize === gridColSize - 1;
 
     if (!onLeftColumn && !onRightColumn) {
       surroundingCells.push.apply(surroundingCells, leftSide.concat(rightSide));
@@ -291,7 +292,7 @@
     }
 
     return surroundingCells.filter(function (index) {
-      return index > -1 && index < Math.pow(gridSize, 2);
+      return index > -1 && index < gridSize[0] * gridSize[1];
     });
   };
 
@@ -302,7 +303,7 @@
       var nextMineIdx = -1;
 
       while (nextMineIdx === -1) {
-        var suggestedIdx = Math.floor(Math.random() * Math.pow(gridSize, 2));
+        var suggestedIdx = Math.floor(Math.random() * gridSize[0] * gridSize[1]);
 
         if (!mines.includes(suggestedIdx)) {
           nextMineIdx = suggestedIdx;
@@ -317,7 +318,7 @@
 
   var initialize = function initialize(gridSize, mines) {
     var mineIndex = setMines(gridSize, mines);
-    return new Array(Math.pow(gridSize, 2)).fill({
+    return new Array(gridSize[0] * gridSize[1]).fill({
       clicked: false,
       flagged: false
     }).map(function (entry, idx) {
@@ -335,9 +336,8 @@
     });
   };
 
-  var clickEvent = function clickEvent(state, clickedIndex) {
-    console.log(clickedIndex);
-    var surroundingCellIndexes = getRelativePositionsOfSurroundingCells(Math.sqrt(state.length), clickedIndex);
+  var clickEvent = function clickEvent(state, gridSize, clickedIndex) {
+    var surroundingCellIndexes = getRelativePositionsOfSurroundingCells(gridSize, clickedIndex);
 
     if (clickedIndex > state.length - 1) {
       return state;
@@ -350,7 +350,7 @@
       }
 
       if (!state[idx].warningCount) {
-        clickEvent(state, idx);
+        clickEvent(state, gridSize, idx);
       } else {
         state[idx].clicked = true;
       }
@@ -358,9 +358,9 @@
     return state;
   };
 
-  var onClickCell = function onClickCell(state, clickedIndex) {
+  var onClickCell = function onClickCell(state, gridSize, clickedIndex) {
     var stateCopy = JSON.parse(JSON.stringify(state));
-    return clickEvent(stateCopy, clickedIndex);
+    return clickEvent(stateCopy, gridSize, clickedIndex);
   };
 
   var Grid = function Grid(props) {
@@ -430,7 +430,7 @@
         return;
       }
 
-      var x = onClickCell(boardState, value);
+      var x = onClickCell(boardState, props.gridSize, value);
       updateBoard(x);
     };
 
@@ -470,7 +470,7 @@
     }), React__default.createElement("div", {
       className: styles.grid,
       style: {
-        gridTemplateColumns: "repeat(".concat(props.gridSize, ", 1fr)")
+        gridTemplateColumns: "repeat(".concat(props.gridSize[0], ", 1fr)")
       }
     }, boardState.map(function (cell, idx) {
       return React__default.createElement(Cell, {
@@ -489,7 +489,7 @@
   };
 
   Grid.defaultProps = {
-    gridSize: 9,
+    gridSize: [9, 9],
     mines: 10
   };
 
@@ -504,7 +504,7 @@
   App.defaultProps = {
     gameId: 1,
     // to trigger restart
-    gridSize: 10,
+    gridSize: [9, 9],
     // @todo needs to be an array
     mines: 11
   };
