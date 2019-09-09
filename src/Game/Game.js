@@ -175,7 +175,7 @@ const Grid = props => {
         <div
           className={styles.grid}
           style={{
-            gridTemplateColumns: `repeat(${props.gridSize[0]}, 1fr)`
+            gridTemplateColumns: `repeat(${props.gridSize[0]}, 16px)`
           }}
         >
           {boardState.map((cell, idx) => (
