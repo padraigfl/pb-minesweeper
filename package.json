@@ -1,6 +1,6 @@
 {
   "name": "pb-minesweeper",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "minesweeper's back, in React form",
   "main": "dist/pbminesweeper.js",
   "module": "dist/pbminesweeper.module.js",

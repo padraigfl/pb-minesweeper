@@ -111,6 +111,7 @@ const Grid = props => {
     updateBoard(initialize(props.gridSize, props.mines));
     updateFlagged([]);
     updateQuestioned([]);
+    updateMovesCount(0);
     setEndState(null);
   };
 
@@ -170,26 +171,28 @@ const Grid = props => {
         totalMoves={movesCount}
         endState={endState}
       />
-      <div
-        className={styles.grid}
-        style={{
-          gridTemplateColumns: `repeat(${props.gridSize[0]}, 1fr)`
-        }}
-      >
-        {boardState.map((cell, idx) => (
-          <Cell
-            mine={cell.isMine}
-            clicked={cell.clicked}
-            end={cell.end}
-            flagged={flagged.includes(idx)}
-            questioned={questioned.includes(idx)}
-            warningCount={cell.warningCount}
-            gameOver={endState}
-            onClick={onClick}
-            onFlag={onFlag}
-            id={idx}
-          />
-        ))}
+      <div className={styles.board}>
+        <div
+          className={styles.grid}
+          style={{
+            gridTemplateColumns: `repeat(${props.gridSize[0]}, 1fr)`
+          }}
+        >
+          {boardState.map((cell, idx) => (
+            <Cell
+              mine={cell.isMine}
+              clicked={cell.clicked}
+              end={cell.end}
+              flagged={flagged.includes(idx)}
+              questioned={questioned.includes(idx)}
+              warningCount={cell.warningCount}
+              gameOver={endState}
+              onClick={onClick}
+              onFlag={onFlag}
+              id={idx}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

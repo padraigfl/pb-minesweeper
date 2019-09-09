@@ -8,7 +8,8 @@ $red: #fb0006;
   background-color: $grey;
   height: 16px;
   width: 16px;
-  box-shadow: inset -1px -1px 0px $darkgrey, inset 1px 1px 0px white;
+  box-shadow: inset -1px -1px 0px $darkgrey, inset 1px 1px 0px white,
+    inset -2px -2px 0px $darkgrey, inset 2px 2px 0px white;
   border: none;
   outline: none;
 
@@ -52,22 +53,36 @@ $red: #fb0006;
   background-color: $red;
 }
 
+.board {
+  box-shadow: inset -1px -1px 0px white, inset 1px 1px 0px $darkgrey,
+    inset -2px -2px 0px white, inset 2px 2px 0px $darkgrey,
+    inset -3px -3px 0px white, inset 3px 3px 0px $darkgrey;
+  padding: 3px;
+}
 .grid {
   display: grid;
   grid-gap: 0px;
   color: #444;
-  margin-bottom: 4px;
-  box-shadow: inset 1px 1px 0px $darkgrey, inset -1px -1px 0px white;
-  padding: 2px 1px 1px 2px;
 }
 .minesweeper {
   display: inline-block;
+  padding: 6px 4px 4px 6px;
+  box-shadow: inset 2px 2px 0px white;
+}
+.counter {
+  display: inline-flex;
+  padding: 1px;
+  box-shadow: inset 1px 1px 0px $darkgrey, inset -1px -1px 0px white;
 }
 .status {
   display: flex;
   justify-content: center;
   align-content: center;
-  margin: 4px 0px;
+  margin-bottom: 6px;
+  box-shadow: inset 1px 1px 0px $darkgrey, inset -1px -1px 0px white,
+    inset 2px 2px 0px $darkgrey, inset -2px -2px 0px white;
+  padding: 6px 4px;
+
   > * {
     margin: 0px 4px;
   }
@@ -77,9 +92,14 @@ $red: #fb0006;
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAVElEQVR42mNgwA3+Y8FEA7CG//8xMbGGYdWMwzDyDcBnEEkG4DIIq9+JFMPuCmINQTaILK8MEUMIGUp04OJLsURHMVoSJxgzVE2xVMs7VMvFZJUnADl0GwKMOgB1AAAAAElFTkSuQmCC);
     background-repeat: no-repeat;
     background-position: center;
-    box-shadow: inset 1px 1px 0px white, inset -1px -1px 0px $darkgrey;
+    // box-shadow: -1px -1px 0px $darkgrey, inset -1px -1px 0px $darkgrey,
+    //   inset 1px 1px 0px white, 1px 1px 0px $darkgrey;
+    box-shadow: -1px -1px 0px $darkgrey, inset 1px 1px 0px white,
+      inset -1px -1px 0px $darkgrey, inset 2px 2px 0px white,
+      inset -2px -2px 0px $darkgrey;
     background-color: $grey;
     outline: none;
+    border: none;
 
     .minesweeper:active & {
       background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAbklEQVR42rWUgQ7AEAxEfbo/77ItXcTuziEkjWj14ahSeAtgdnsSIv7mwmAyga0DFOgL1vpOuPs2Cfl7EDo30wNChisqf4KmtGDanIUwfWxIapATey2G4mZQjeUVz+xEPjhHk+2nbxXhbhUv/ScXq9MFJP/q1DsAAAAASUVORK5CYII=);
@@ -91,4 +111,11 @@ $red: #fb0006;
       background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAZ0lEQVR42q2U0Q4AEAhF+28fn/FgmXuT0taD7B5SEeGmwMM2BaqnR2FQTGB5gAd6AjAQyps6grgAL25Ba4EEXmyDWHJr52kWNPZRyVOPCtOpQgRdnQlCJb5V6mvDlVs/NITVKU79Jx0lUucVtHPCpwAAAABJRU5ErkJggg==);
     }
   }
+}
+.buttonBorder {
+  box-shadow: 1px 1px 0px;
+}
+
+body {
+  background-color: pink;
 }
