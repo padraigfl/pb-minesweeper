@@ -4,12 +4,21 @@ $black: #0c0c0c;
 $darkgrey: #808088;
 $red: #fb0006;
 
+@function dualshadow($color1, $color2) {
+  @return inset 1px 1px 0px $color1, inset -1px -1px 0px $color2,
+    inset 2px 2px 0px $color1, inset -2px -2px 0px $color2;
+}
+
+@function dualshadowReverse($color1, $color2) {
+  @return inset -1px -1px 0px $color1, inset 1px 1px 0px $color2,
+    inset -2px -2px 0px $color1, inset 2px 2px 0px $color2;
+}
+
 .cell {
   background-color: $grey;
   height: 16px;
   width: 16px;
-  box-shadow: inset -1px -1px 0px $darkgrey, inset 1px 1px 0px white,
-    inset -2px -2px 0px $darkgrey, inset 2px 2px 0px white;
+  box-shadow: dualshadowReverse($darkgrey, white);
   border: none;
   outline: none;
 
@@ -54,9 +63,8 @@ $red: #fb0006;
 }
 
 .board {
-  box-shadow: inset -1px -1px 0px white, inset 1px 1px 0px $darkgrey,
-    inset -2px -2px 0px white, inset 2px 2px 0px $darkgrey,
-    inset -3px -3px 0px white, inset 3px 3px 0px $darkgrey;
+  box-shadow: dualshadowReverse(white, $darkgrey), inset -3px -3px 0px white,
+    inset 3px 3px 0px $darkgrey;
   padding: 3px;
 }
 .grid {
@@ -79,8 +87,7 @@ $red: #fb0006;
   justify-content: center;
   align-content: center;
   margin-bottom: 6px;
-  box-shadow: inset 1px 1px 0px $darkgrey, inset -1px -1px 0px white,
-    inset 2px 2px 0px $darkgrey, inset -2px -2px 0px white;
+  box-shadow: dualshadow($darkgrey, white);
   padding: 6px 4px;
 
   > * {
@@ -92,11 +99,7 @@ $red: #fb0006;
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAVElEQVR42mNgwA3+Y8FEA7CG//8xMbGGYdWMwzDyDcBnEEkG4DIIq9+JFMPuCmINQTaILK8MEUMIGUp04OJLsURHMVoSJxgzVE2xVMs7VMvFZJUnADl0GwKMOgB1AAAAAElFTkSuQmCC);
     background-repeat: no-repeat;
     background-position: center;
-    // box-shadow: -1px -1px 0px $darkgrey, inset -1px -1px 0px $darkgrey,
-    //   inset 1px 1px 0px white, 1px 1px 0px $darkgrey;
-    box-shadow: -1px -1px 0px $darkgrey, inset 1px 1px 0px white,
-      inset -1px -1px 0px $darkgrey, inset 2px 2px 0px white,
-      inset -2px -2px 0px $darkgrey;
+    box-shadow: -1px -1px 0px $darkgrey, dualshadow(white, $darkgrey);
     background-color: $grey;
     outline: none;
     border: none;
