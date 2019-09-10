@@ -21,6 +21,7 @@ $red: #fb0006;
   box-shadow: dualshadowReverse($darkgrey, white);
   border: none;
   outline: none;
+  padding: 0px; // iOS button bug
 
   &.clicked,
   &:hover:active,
