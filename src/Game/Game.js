@@ -180,6 +180,7 @@ const Grid = props => {
         >
           {boardState.map((cell, idx) => (
             <Cell
+              key={idx}
               mine={cell.isMine}
               clicked={cell.clicked}
               end={cell.end}
