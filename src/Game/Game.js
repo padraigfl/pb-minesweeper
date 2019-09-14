@@ -4,6 +4,13 @@ import Cell from './Cell';
 import styles from './_game.module.scss';
 import Status from './Status';
 
+const STATES = {
+  NEW: 'NEW',
+  ACTIVE: 'ACTIVE',
+  SUCCESS: 'SUCCESS',
+  FAILURE: 'FAILURE'
+};
+
 const getRelativePositionsOfSurroundingCells = (gridSize, idx) => {
   const gridColSize = gridSize[0];
   const surroundingCells = [idx - gridColSize, idx + gridColSize];
@@ -104,23 +111,21 @@ const Grid = props => {
   );
   const [flagged, updateFlagged] = useState([]);
   const [questioned, updateQuestioned] = useState([]);
-  const [movesCount, updateMovesCount] = useState(0);
-  const [endState, setEndState] = useState(null);
+  const [gameState, updateGameState] = useState(STATES.NEW);
 
   const restart = () => {
     updateBoard(initialize(props.gridSize, props.mines));
     updateFlagged([]);
     updateQuestioned([]);
-    updateMovesCount(0);
-    setEndState(null);
+    updateGameState(STATES.NEW);
   };
 
   useEffect(() => {
     const remaining = boardState.filter(cell => !cell.clicked).length;
     if (remaining === 0) {
-      setEndState({ lose: true });
+      updateGameState(STATES.FAILURE);
     } else if (remaining === props.mines) {
-      setEndState({ win: true });
+      updateGameState(STATES.SUCCESS);
     }
   }, boardState);
 
@@ -128,10 +133,13 @@ const Grid = props => {
 
   const onClick = e => {
     const value = +e.target.dataset.value;
-    updateMovesCount(movesCount + 1);
+    if (gameState === STATES.NEW) {
+      updateGameState(STATES.ACTIVE);
+    }
     if (boardState[value].isMine) {
       const updatedBoard = boardState.map(val => ({ ...val, clicked: true }));
       updatedBoard[value].end = true;
+      updateGameState(STATES.FAILURE);
       updateBoard(updatedBoard);
       return;
     }
@@ -160,16 +168,15 @@ const Grid = props => {
   return (
     <div
       className={cx(styles.minesweeper, {
-        [styles.win]: endState && endState.win,
-        [styles.lose]: endState && endState.lose
+        [styles.win]: gameState === STATES.SUCCESS,
+        [styles.lose]: gameState === STATES.FAILURE
       })}
     >
       <Status
         totalMines={props.mines}
         numberFlagged={flagged.length}
         newGame={restart}
-        totalMoves={movesCount}
-        endState={endState}
+        gameState={gameState}
       />
       <div className={styles.board}>
         <div
@@ -187,7 +194,7 @@ const Grid = props => {
               flagged={flagged.includes(idx)}
               questioned={questioned.includes(idx)}
               warningCount={cell.warningCount}
-              gameOver={endState}
+              gameOver={[STATES.SUCCESS, STATES.FAILURE].includes(gameState)}
               onClick={onClick}
               onFlag={onFlag}
               id={idx}

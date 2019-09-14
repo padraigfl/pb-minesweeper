@@ -255,6 +255,35 @@ var Counter = function Counter(props) {
   }));
 };
 
+var timeTracker = 0;
+
+var Timer = function Timer(props) {
+  var _React$useState = React.useState(0),
+      _React$useState2 = _slicedToArray(_React$useState, 2),
+      time = _React$useState2[0],
+      updateTime = _React$useState2[1];
+
+  React.useEffect(function () {
+    if (props.status === 'NEW') {
+      timeTracker = 0;
+      updateTime(timeTracker);
+    }
+
+    var x = window.setInterval(function () {
+      if (props.status === 'ACTIVE') {
+        timeTracker = timeTracker + 1;
+        updateTime(timeTracker);
+      }
+    }, 1000);
+    return function () {
+      window.clearInterval(x);
+    };
+  }, [props.status]);
+  return React.createElement(Counter, {
+    value: time % 1000
+  });
+};
+
 var Status = function Status(props) {
   return React.createElement("div", {
     className: styles.status
@@ -264,9 +293,16 @@ var Status = function Status(props) {
     className: "",
     onClick: props.newGame,
     type: "button"
-  }), React.createElement(Counter, {
-    value: props.totalMoves
+  }), React.createElement(Timer, {
+    status: props.gameState
   }));
+};
+
+var STATES = {
+  NEW: 'NEW',
+  ACTIVE: 'ACTIVE',
+  SUCCESS: 'SUCCESS',
+  FAILURE: 'FAILURE'
 };
 
 var getRelativePositionsOfSurroundingCells = function getRelativePositionsOfSurroundingCells(gridSize, idx) {
@@ -375,22 +411,16 @@ var Grid = function Grid(props) {
       questioned = _useState6[0],
       updateQuestioned = _useState6[1];
 
-  var _useState7 = useState(0),
+  var _useState7 = useState(STATES.NEW),
       _useState8 = _slicedToArray(_useState7, 2),
-      movesCount = _useState8[0],
-      updateMovesCount = _useState8[1];
-
-  var _useState9 = useState(null),
-      _useState10 = _slicedToArray(_useState9, 2),
-      endState = _useState10[0],
-      setEndState = _useState10[1];
+      gameState = _useState8[0],
+      updateGameState = _useState8[1];
 
   var restart = function restart() {
     updateBoard(initialize(props.gridSize, props.mines));
     updateFlagged([]);
     updateQuestioned([]);
-    updateMovesCount(0);
-    setEndState(null);
+    updateGameState(STATES.NEW);
   };
 
   useEffect(function () {
@@ -399,20 +429,19 @@ var Grid = function Grid(props) {
     }).length;
 
     if (remaining === 0) {
-      setEndState({
-        lose: true
-      });
+      updateGameState(STATES.FAILURE);
     } else if (remaining === props.mines) {
-      setEndState({
-        win: true
-      });
+      updateGameState(STATES.SUCCESS);
     }
   }, boardState);
   useEffect(restart, [props.gameId]);
 
   var onClick = function onClick(e) {
     var value = +e.target.dataset.value;
-    updateMovesCount(movesCount + 1);
+
+    if (gameState === STATES.NEW) {
+      updateGameState(STATES.ACTIVE);
+    }
 
     if (boardState[value].isMine) {
       var updatedBoard = boardState.map(function (val) {
@@ -421,6 +450,7 @@ var Grid = function Grid(props) {
         });
       });
       updatedBoard[value].end = true;
+      updateGameState(STATES.FAILURE);
       updateBoard(updatedBoard);
       return;
     }
@@ -455,13 +485,12 @@ var Grid = function Grid(props) {
   };
 
   return React.createElement("div", {
-    className: cx(styles.minesweeper, (_cx = {}, _defineProperty(_cx, styles.win, endState && endState.win), _defineProperty(_cx, styles.lose, endState && endState.lose), _cx))
+    className: cx(styles.minesweeper, (_cx = {}, _defineProperty(_cx, styles.win, gameState === STATES.SUCCESS), _defineProperty(_cx, styles.lose, gameState === STATES.FAILURE), _cx))
   }, React.createElement(Status, {
     totalMines: props.mines,
     numberFlagged: flagged.length,
     newGame: restart,
-    totalMoves: movesCount,
-    endState: endState
+    gameState: gameState
   }), React.createElement("div", {
     className: styles.board
   }, React.createElement("div", {
@@ -471,13 +500,14 @@ var Grid = function Grid(props) {
     }
   }, boardState.map(function (cell, idx) {
     return React.createElement(Cell, {
+      key: idx,
       mine: cell.isMine,
       clicked: cell.clicked,
       end: cell.end,
       flagged: flagged.includes(idx),
       questioned: questioned.includes(idx),
       warningCount: cell.warningCount,
-      gameOver: endState,
+      gameOver: [STATES.SUCCESS, STATES.FAILURE].includes(gameState),
       onClick: onClick,
       onFlag: onFlag,
       id: idx
