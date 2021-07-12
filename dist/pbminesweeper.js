@@ -332,7 +332,7 @@
     });
   };
 
-  var setMines = function setMines(gridSize, minesCount) {
+  var setMines = function setMines(gridSize, minesCount, initialCell) {
     var mines = [];
 
     for (var i = 0; i < minesCount; i += 1) {
@@ -341,7 +341,7 @@
       while (nextMineIdx === -1) {
         var suggestedIdx = Math.floor(Math.random() * gridSize[0] * gridSize[1]);
 
-        if (!mines.includes(suggestedIdx)) {
+        if (!mines.includes(suggestedIdx) && suggestedIdx !== initialCell) {
           nextMineIdx = suggestedIdx;
         }
       }
@@ -352,8 +352,8 @@
     return mines;
   };
 
-  var initialize = function initialize(gridSize, mines) {
-    var mineIndex = setMines(gridSize, mines);
+  var initialize = function initialize(gridSize, mines, initialCell) {
+    var mineIndex = setMines(gridSize, mines, initialCell);
     return new Array(gridSize[0] * gridSize[1]).fill({
       clicked: false,
       flagged: false
@@ -402,7 +402,7 @@
   var Grid = function Grid(props) {
     var _cx;
 
-    var _useState = React.useState(initialize(props.gridSize, props.mines)),
+    var _useState = React.useState(new Array(props.gridSize[0] * props.gridSize[1]).fill({})),
         _useState2 = _slicedToArray(_useState, 2),
         boardState = _useState2[0],
         updateBoard = _useState2[1];
@@ -422,11 +422,17 @@
         gameState = _useState8[0],
         updateGameState = _useState8[1];
 
+    var _useState9 = React.useState(false),
+        _useState10 = _slicedToArray(_useState9, 2),
+        isInitialized = _useState10[0],
+        setInitialize = _useState10[1];
+
     var restart = function restart() {
-      updateBoard(initialize(props.gridSize, props.mines));
+      updateBoard(new Array(props.gridSize[0] * props.gridSize[1]).fill({}));
       updateFlagged([]);
       updateQuestioned([]);
       updateGameState(STATES.NEW);
+      setInitialize(false);
     };
 
     React.useEffect(function () {
@@ -443,14 +449,22 @@
     React.useEffect(restart, [props.gameId]);
 
     var onClick = function onClick(e) {
+      var board = boardState;
+
+      if (!isInitialized) {
+        board = initialize(props.gridSize, props.mines, +e.target.dataset.value);
+        updateBoard(boardState);
+        setInitialize(true);
+      }
+
       var value = +e.target.dataset.value;
 
       if (gameState === STATES.NEW) {
         updateGameState(STATES.ACTIVE);
       }
 
-      if (boardState[value].isMine) {
-        var updatedBoard = boardState.map(function (val) {
+      if (board[value].isMine) {
+        var updatedBoard = board.map(function (val) {
           return _objectSpread({}, val, {
             clicked: true
           });
@@ -461,7 +475,7 @@
         return;
       }
 
-      var x = onClickCell(boardState, props.gridSize, value);
+      var x = onClickCell(board, props.gridSize, value);
       updateBoard(x);
     };
 

@@ -32,7 +32,7 @@ const getRelativePositionsOfSurroundingCells = (gridSize, idx) => {
   );
 };
 
-const setMines = (gridSize, minesCount) => {
+const setMines = (gridSize, minesCount, initialCell) => {
   const mines = [];
   for (let i = 0; i < minesCount; i += 1) {
     let nextMineIdx = -1;
@@ -40,7 +40,7 @@ const setMines = (gridSize, minesCount) => {
       const suggestedIdx = Math.floor(
         Math.random() * gridSize[0] * gridSize[1]
       );
-      if (!mines.includes(suggestedIdx)) {
+      if (!mines.includes(suggestedIdx) && suggestedIdx !== initialCell) {
         nextMineIdx = suggestedIdx;
       }
     }
@@ -49,8 +49,8 @@ const setMines = (gridSize, minesCount) => {
   return mines;
 };
 
-const initialize = (gridSize, mines) => {
-  const mineIndex = setMines(gridSize, mines);
+const initialize = (gridSize, mines, initialCell) => {
+  const mineIndex = setMines(gridSize, mines, initialCell);
   return new Array(gridSize[0] * gridSize[1])
     .fill({
       clicked: false,
@@ -106,18 +106,18 @@ const onClickCell = (state, gridSize, clickedIndex) => {
 };
 
 const Grid = props => {
-  const [boardState, updateBoard] = useState(
-    initialize(props.gridSize, props.mines)
-  );
+  const [boardState, updateBoard] = useState(new Array(props.gridSize[0]*props.gridSize[1]).fill({}));
   const [flagged, updateFlagged] = useState([]);
   const [questioned, updateQuestioned] = useState([]);
   const [gameState, updateGameState] = useState(STATES.NEW);
+  const [isInitialized, setInitialize] = useState(false);
 
   const restart = () => {
-    updateBoard(initialize(props.gridSize, props.mines));
+    updateBoard(new Array(props.gridSize[0]*props.gridSize[1]).fill({}));
     updateFlagged([]);
     updateQuestioned([]);
     updateGameState(STATES.NEW);
+    setInitialize(false);
   };
 
   useEffect(() => {
@@ -132,18 +132,24 @@ const Grid = props => {
   useEffect(restart, [props.gameId]);
 
   const onClick = e => {
+    let board = boardState;
+    if (!isInitialized) {
+      board = initialize(props.gridSize, props.mines, +e.target.dataset.value)
+      updateBoard(boardState)
+      setInitialize(true);
+    }
     const value = +e.target.dataset.value;
     if (gameState === STATES.NEW) {
       updateGameState(STATES.ACTIVE);
     }
-    if (boardState[value].isMine) {
-      const updatedBoard = boardState.map(val => ({ ...val, clicked: true }));
+    if (board[value].isMine) {
+      const updatedBoard = board.map(val => ({ ...val, clicked: true }));
       updatedBoard[value].end = true;
       updateGameState(STATES.FAILURE);
       updateBoard(updatedBoard);
       return;
     }
-    const x = onClickCell(boardState, props.gridSize, value);
+    const x = onClickCell(board, props.gridSize, value);
     updateBoard(x);
   };
 
